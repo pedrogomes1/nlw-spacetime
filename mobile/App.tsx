@@ -1,7 +1,9 @@
+import { useEffect } from "react";
+import * as SecureStore from 'expo-secure-store';
 import { styled } from "nativewind";
 import { StatusBar } from "expo-status-bar";
 import { ImageBackground, View, Text, TouchableOpacity } from "react-native";
-
+import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import {
   useFonts,
   Roboto_400Regular,
@@ -12,6 +14,13 @@ import { BaiJamjuree_700Bold } from "@expo-google-fonts/bai-jamjuree";
 import blurBg from "./src/assets/bg-blur.png";
 import Stripes from "./src/assets/stripes.svg";
 import NLWLogo from "./src/assets/nlw-spacetime-logo.svg";
+import { api } from "./src/lib/api";
+
+const discovery = {
+  authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+  tokenEndpoint: 'https://github.com/login/oauth/access_token',
+  revocationEndpoint: 'https://github.com/settings/connections/applications/ea1368baecfece00cb1a',
+};
 
 export default function App() {
   const [hasLoadedFonts] = useFonts({
@@ -19,6 +28,32 @@ export default function App() {
     Roboto_700Bold,
     BaiJamjuree_700Bold,
   });
+
+  const [request, response, signInWithGithub] = useAuthRequest(
+    {
+      clientId: 'ea1368baecfece00cb1a',
+      scopes: ['identity'],
+      redirectUri: makeRedirectUri({
+        scheme: 'nlwspacetime'
+      }),
+    },
+    discovery
+  );
+
+  useEffect(() => {
+
+    if (response?.type === 'success') {
+      const { code } = response.params;
+
+      api.post('/register', {
+        code
+      }).then((response) => {
+        const { token } = response.data
+
+        SecureStore.setItemAsync('token', token);
+      }).catch((err) => console.log(err))
+    }
+  }, [response]);
 
   const StyledStripes = styled(Stripes);
   if (!hasLoadedFonts) return null;
@@ -50,6 +85,7 @@ export default function App() {
         <TouchableOpacity
           activeOpacity={0.7}
           className="rounded-full bg-green-500 px-5 py-2"
+          onPress={() => signInWithGithub()}
         >
           <Text className="font-alt text-sm uppercase text-black">
             Cadastrar lembrança
