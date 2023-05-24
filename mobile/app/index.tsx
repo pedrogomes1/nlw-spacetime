@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import * as SecureStore from 'expo-secure-store';
 import { styled } from "nativewind";
+import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ImageBackground, View, Text, TouchableOpacity } from "react-native";
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
@@ -11,10 +12,10 @@ import {
 } from "@expo-google-fonts/roboto";
 import { BaiJamjuree_700Bold } from "@expo-google-fonts/bai-jamjuree";
 
-import blurBg from "./src/assets/bg-blur.png";
-import Stripes from "./src/assets/stripes.svg";
-import NLWLogo from "./src/assets/nlw-spacetime-logo.svg";
-import { api } from "./src/lib/api";
+import blurBg from "../src/assets/bg-blur.png";
+import Stripes from "../src/assets/stripes.svg";
+import NLWLogo from "../src/assets/nlw-spacetime-logo.svg";
+import { api } from "../src/lib/api";
 
 const discovery = {
   authorizationEndpoint: 'https://github.com/login/oauth/authorize',
@@ -23,6 +24,7 @@ const discovery = {
 };
 
 export default function App() {
+  const router = useRouter();
   const [hasLoadedFonts] = useFonts({
     Roboto_400Regular,
     Roboto_700Bold,
@@ -40,18 +42,24 @@ export default function App() {
     discovery
   );
 
+  async function handleGithubOAuthCode(code: string){
+    const response = await api.post('/register', {
+        code
+      })
+
+    const { token } = response.data
+
+    await SecureStore.setItemAsync('token', token);
+    router.push('/memories')
+  }
+
   useEffect(() => {
 
     if (response?.type === 'success') {
       const { code } = response.params;
 
-      api.post('/register', {
-        code
-      }).then((response) => {
-        const { token } = response.data
 
-        SecureStore.setItemAsync('token', token);
-      }).catch((err) => console.log(err))
+      handleGithubOAuthCode(code)
     }
   }, [response]);
 
