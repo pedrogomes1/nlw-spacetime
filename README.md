@@ -11,7 +11,7 @@
 <img alt="NLW Spacetime" title="NlW Spacetime - 2023" src="https://github.com/pedrogomes1/nlw-spacetime/assets/45200253/b2c4367f-b489-4259-98be-4dc45acb3d69" />
 
 ## :memo: Project
-The project consists of registering and listing memories and memories of events. The main objective was to keep up to date with front/web/server technologies, such as the latest version of Next 13.4, Expo, Tailwindcss, Fastify, etc. It was a follow up to [Rocketseat](https://rocketseat.com.br/) Next Level Week (NLW) event
+The project consists of registering and listing memories and memories of events. The main objective was to keep up to date with front/web/server technologies, such as the latest version of Nextjs 13.4, Expo, Tailwindcss, Fastify, etc. It was a follow up to [Rocketseat](https://rocketseat.com.br/) Next Level Week (NLW) event
 ## :computer: Technologies
 
  The following technologies were used in the project:
